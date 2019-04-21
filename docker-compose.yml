@@ -10,6 +10,21 @@ services:
       - LOG_LEVEL=debug
       - NODE_ENV=docker
     volumes:
-      - ~/.aws/credentials:/home/node/.aws/credentials
       - ../aws-demo-app-2019-api/src:/opt/app/src
     command: dev
+  aws-sqs-local:
+    build:
+      context: ./AWS-SQS-local
+      dockerfile: Dockerfile
+    ports:
+      - "6000:6000"
+  aws-s3-local:
+    image: "adobe/s3mock:2.1.5"
+    ports:
+      - "9090:7000"
+  aws-dynomodb-local:
+    image: "amazon/dynamodb-local:1.11.477"
+    ports:
+      - "8000:8000"
+
+      
