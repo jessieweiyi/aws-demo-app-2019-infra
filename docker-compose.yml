@@ -1,0 +1,15 @@
+version: '3'
+services:
+  aws-demo-app-api:
+    build:
+      context: ../aws-demo-app-2019-api
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - LOG_LEVEL=debug
+      - NODE_ENV=docker
+    volumes:
+      - ~/.aws/credentials:/home/node/.aws/credentials
+      - ../aws-demo-app-2019-api/src:/opt/app/src
+    command: dev
