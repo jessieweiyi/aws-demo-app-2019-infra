@@ -8,20 +8,34 @@ services:
       - "4000:4000"
     environment:
       - LOG_LEVEL=debug
-      - NODE_ENV=docker
     volumes:
       - ../aws-demo-app-2019-api/src:/opt/app/src
+      - ../aws-demo-app-2019-api/.env.docker:/opt/app/.env
+      - ./mocks/credentials:/home/node/.aws/credentials
+    command: dev
+  aws-demo-app-worker:
+    build:
+      context: ../aws-demo-app-2019-worker
+      dockerfile: Dockerfile
+    environment:
+      - LOG_LEVEL=debug
+    volumes:
+      - ../aws-demo-app-2019-worker/src:/opt/app/src
+      - ../aws-demo-app-2019-worker/.env.docker:/opt/app/.env
+      - ./mocks/credentials:/home/node/.aws/credentials
     command: dev
   aws-sqs-local:
     build:
-      context: ./AWS-SQS-local
+      context: ./mocks/AWS-SQS-local
       dockerfile: Dockerfile
     ports:
       - "6000:6000"
   aws-s3-local:
     image: "adobe/s3mock:2.1.5"
     ports:
-      - "9090:7000"
+      - "7000:9090"
+    environment:
+      - initialBuckets=aws-demo-app-2019
   aws-dynomodb-local:
     image: "amazon/dynamodb-local:1.11.477"
     ports:
