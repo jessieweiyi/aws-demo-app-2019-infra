@@ -36,7 +36,7 @@ services:
       - "7000:9090"
     environment:
       - initialBuckets=aws-demo-app-2019
-  aws-dynomodb-local:
+  aws-dynamodb-local:
     image: "amazon/dynamodb-local:1.11.477"
     ports:
       - "8000:8000"
