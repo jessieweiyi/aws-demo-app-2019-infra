@@ -1,0 +1,79 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS Services including a S3 bucket, a DynamoDB table, and a SQS queue with a dead letter queue.
+Parameters: 
+  Environment:
+    Type: String
+    Default: dev
+    Description: "The deployment environment: dev, prod"
+  S3BucketName:
+    Type: String
+    Description: The S3 Bucket Name
+  SQSQueueName:
+    Type: String
+    Description: The SQS Queue Name
+  SQSDeadLetterQueueName:
+    Type: String
+    Description: The SQS Dead Letter Queue Name
+  DynamoDBTableName:
+    Type: String
+    Description: The DynamoDB Table Name
+Resources: 
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      AccessControl: PublicRead
+  PublicAccessBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref 'S3Bucket'
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: s3:GetObject
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, /*]]
+  SQSQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      QueueName: !Ref SQSQueueName
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt SQSDeadLetterQueue.Arn
+        maxReceiveCount: 1
+  SQSDeadLetterQueue:
+    Type: "AWS::SQS::Queue"
+    Properties:
+      QueueName: !Ref SQSDeadLetterQueueName
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      TableName: !Ref DynamoDBTableName
+      AttributeDefinitions: 
+        - 
+          AttributeName: "jobId"
+          AttributeType: "S"
+      KeySchema: 
+        - 
+          AttributeName: "jobId"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+Outputs:
+  S3BucketName:
+    Description: "Name of the S3 bucket"
+    Value: !Ref S3BucketName
+    Export:
+      Name: !Sub ${Environment}:S3BucketName
+  SQSQueueARN:
+    Description: "ARN of newly created SQS Queue"
+    Value: !GetAtt SQSQueue.Arn
+    Export:
+      Name: !Sub ${Environment}:SQSQueueARN
+  DynamoDBTableName:
+    Description: "Name of the DynamoDB table"
+    Value: !Ref DynamoDBTableName
+    Export:
+      Name: !Sub ${Environment}:DynamoDBTableName
+  

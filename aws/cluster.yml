@@ -1,10 +1,10 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: AWS Fargate cluster that span two public subnets and two private subnets.
+Description: AWS ECS Fargate cluster that span two public subnets and two private subnets.
 Parameters: 
   Environment:
-      Type: String
-      Default: dev
-      Description: "The deployment environment: dev, prod"
+    Type: String
+    Default: dev
+    Description: "The deployment environment: dev, prod"
 Mappings: 
   SubnetConfig:
     VPC:

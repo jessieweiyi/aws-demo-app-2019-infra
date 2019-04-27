@@ -24,21 +24,17 @@ services:
       - ../aws-demo-app-2019-worker/.env.docker:/opt/app/.env
       - ./mocks/credentials:/home/node/.aws/credentials
     command: dev
-  aws-sqs-local:
-    build:
-      context: ./mocks/AWS-SQS-local
-      dockerfile: Dockerfile
+  aws-localstack:
+    image: "localstack/localstack:0.8.0"
     ports:
-      - "6000:6000"
-  aws-s3-local:
-    image: "adobe/s3mock:2.1.5"
-    ports:
-      - "7000:9090"
-    environment:
-      - initialBuckets=aws-demo-app-2019
-  aws-dynamodb-local:
-    image: "amazon/dynamodb-local:1.11.477"
-    ports:
-      - "8000:8000"
+      - "6000:4576"
+      - "7000:4572"
+      - "8000:4569"
+      - "8088:8080"
+    environment: 
+      - SERVICES = s3,sqs,dynamodb
+      - DATA_DIR = /tmp/localstack/data
+    volumes:
+      - /tmp/localstack:/tmp/localstack
 
       
