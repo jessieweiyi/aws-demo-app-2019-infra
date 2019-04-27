@@ -65,15 +65,15 @@ Outputs:
     Description: "Name of the S3 bucket"
     Value: !Ref S3BucketName
     Export:
-      Name: !Sub ${Environment}:S3BucketName
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'S3BucketName'] ]
   SQSQueueARN:
     Description: "ARN of newly created SQS Queue"
     Value: !GetAtt SQSQueue.Arn
     Export:
-      Name: !Sub ${Environment}:SQSQueueARN
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'SQSQueueARN' ] ]
   DynamoDBTableName:
     Description: "Name of the DynamoDB table"
     Value: !Ref DynamoDBTableName
     Export:
-      Name: !Sub ${Environment}:DynamoDBTableName
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'DynamoDBTableName' ] ]
   
