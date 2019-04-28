@@ -88,11 +88,23 @@ Resources:
       CidrBlock: !FindInMap ['SubnetConfig', 'PrivateTwo', 'CIDR']
   ECSCluster:
     Type: AWS::ECS::Cluster
+  CloudwatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Join ["", ["ECSLogGroup-", !Ref Environment]]
+      RetentionInDays: "1"
   ContainerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Access to the Fargate containers
       VpcId: !Ref 'VPC'
+  ContainerSecurityGroupIngressFromSelf:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress from other containers in the same security group
+      GroupId: !Ref 'ContainerSecurityGroup'
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref 'ContainerSecurityGroup'
   AutoscalingRole:
     Type: AWS::IAM::Role
     Properties:
@@ -213,6 +225,11 @@ Outputs:
     Value: !Ref 'PrivateSubnetTwo'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PrivateSubnetTwo' ] ]
+  CloudwatchLogsGroup:
+    Description: Cloudwatch log group used to group the log stream in the same cluster
+    Value: !Ref 'CloudwatchLogsGroup'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'CloudwatchLogsGroup' ] ]
   ContainerSecurityGroup:
     Description: A security group used to allow Fargate containers to receive traffic
     Value: !Ref 'ContainerSecurityGroup'
