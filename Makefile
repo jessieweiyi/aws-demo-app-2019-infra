@@ -3,16 +3,17 @@ ENVIRONMENT := dev
 
 SQS_LOCAL_PORT:=6000
 SQS_QUEUE_NAME:=aws-demo-app-2019-jobs
-S3_LOCAL_PORT:=7000
+S3_LOCAL_PORT:=4572
 S3_BUCKET_NAME:=aws-demo-app-2019
 DYNAMODB_LOCAL_PORT:=8000
 DYNAMODB_TABLE_NAME:=aws-demo-app-2019-jobs
 
 .PHONY: setup-mocks
 setup-mocks:
+	sleep 5 && \
+	./mocks/setupMockS3Bucket.sh localhost ${S3_LOCAL_PORT} ${S3_BUCKET_NAME} && \
+	./mocks/setupMockDBTable.sh localhost ${DYNAMODB_LOCAL_PORT} ${DYNAMODB_TABLE_NAME} && \
 	./mocks/setupMockSQSQueue.sh localhost ${SQS_LOCAL_PORT} ${SQS_QUEUE_NAME} &
-	./mocks/setupMockS3Bucket.sh localhost ${S3_LOCAL_PORT} ${S3_BUCKET_NAME} &
-	./mocks/setupMockDBTable.sh localhost ${DYNAMODB_LOCAL_PORT} ${DYNAMODB_TABLE_NAME} &
 
 .PHONY: run-local-dev
 run-local-dev: setup-mocks

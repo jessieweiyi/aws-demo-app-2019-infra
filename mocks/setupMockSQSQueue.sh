@@ -5,7 +5,7 @@ echo Host: $1
 echo Port: $2
 echo SQS Queue: $3
 
-sleep 5
+sleep 1
 
 continue=1
 echo -n "waiting for Local SQS Service online to create the queue"
@@ -20,5 +20,5 @@ do
    fi
 done
 
-sleep 5
+sleep 3
 AWS_ACCESS_KEY_ID=your_access_key_id AWS_SECRET_ACCESS_KEY=your_secret_access_key aws sqs create-queue --endpoint-url http://$1:$2 --queue-name $3

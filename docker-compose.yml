@@ -28,7 +28,7 @@ services:
     image: "localstack/localstack:0.8.0"
     ports:
       - "6000:4576"
-      - "7000:4572"
+      - "4572:4572"
       - "8000:4569"
       - "8088:8080"
     environment: 

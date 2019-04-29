@@ -5,7 +5,7 @@ echo Host: $1
 echo Port: $2
 echo S3 Bucket: $3
 
-sleep 3
+sleep 1
 
 continue=1
 echo -n "waiting for Local S3 Service online to create the bucket"
@@ -20,5 +20,5 @@ do
    fi
 done
 
-sleep 5
+sleep 3
 AWS_ACCESS_KEY_ID=your_access_key_id AWS_SECRET_ACCESS_KEY=your_secret_access_key aws s3 mb --endpoint-url http://$1:$2 s3://$3
