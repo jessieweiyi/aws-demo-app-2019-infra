@@ -142,4 +142,13 @@ Outputs:
     Value: !Ref 'LoadBalancerSG'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerSecurityGroup' ] ]
-
+  LoadBalancerCanonicalHostedZoneID:
+    Description: LoadBalancer Canonical Hosted Zone ID
+    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerCanonicalHostedZoneID' ] ]
+  LoadBalancerDNSName:
+    Description: LoadBalancer DNS Name
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerDNSName' ] ]
