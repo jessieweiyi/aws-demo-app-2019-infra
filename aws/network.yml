@@ -86,6 +86,95 @@ Resources:
         - Fn::GetAZs: !Ref 'AWS::Region'
       VpcId: !Ref 'VPC'
       CidrBlock: !FindInMap ['SubnetConfig', 'PrivateTwo', 'CIDR']
+  PrivateRouteTableOne:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PrivateRouteTableOneAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableOne
+      SubnetId: !Ref PrivateSubnetOne
+  PrivateRouteTableTwo:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref 'VPC'
+  PrivateRouteTableTwoAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PrivateRouteTableTwo
+      SubnetId: !Ref PrivateSubnetTwo
+  PrivateSubnetSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for Private subnets
+      VpcId: !Ref VPC
+  DynamoDBEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "*"
+            Principal: "*"
+            Resource: "*"
+      RouteTableIds:
+        - !Ref 'PrivateRouteTableOne'
+        - !Ref 'PrivateRouteTableTwo'
+      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".dynamodb" ] ]
+      VpcId: !Ref 'VPC'
+  S3Endpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Action: "*"
+            Principal: "*"
+            Resource: "*"
+      RouteTableIds:
+        - !Ref 'PrivateRouteTableOne'
+        - !Ref 'PrivateRouteTableTwo'
+      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".s3" ] ]
+      VpcId: !Ref 'VPC'
+  SQSEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".sqs" ] ]
+      VpcId: !Ref 'VPC'
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref PrivateSubnetSecurityGroup
+      PrivateDnsEnabled: true
+  ECRPrivateLink:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".ecr.dkr" ] ]
+      VpcId: !Ref 'VPC'
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref PrivateSubnetSecurityGroup
+      PrivateDnsEnabled: true
+  CloudwatchEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".monitoring" ] ]
+      VpcId: !Ref 'VPC'
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref PrivateSubnetOne
+        - !Ref PrivateSubnetTwo
+      SecurityGroupIds:
+        - !Ref PrivateSubnetSecurityGroup
+      PrivateDnsEnabled: true
   LoadBalancer:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -152,3 +241,8 @@ Outputs:
     Value: !GetAtt LoadBalancer.DNSName
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerDNSName' ] ]
+  PrivateSubnetSecurityGroup:
+    Description: The Security Groups for all endpoints
+    Value: !Ref PrivateSubnetSecurityGroup
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PrivateSubnetSecurityGroup' ] ]
