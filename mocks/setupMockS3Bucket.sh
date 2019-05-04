@@ -20,5 +20,5 @@ do
    fi
 done
 
-sleep 3
+sleep 1
 AWS_ACCESS_KEY_ID=your_access_key_id AWS_SECRET_ACCESS_KEY=your_secret_access_key aws s3 mb --endpoint-url http://$1:$2 s3://$3

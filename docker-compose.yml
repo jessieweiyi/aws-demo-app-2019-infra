@@ -1,29 +1,45 @@
-version: '3'
+version: '3.4'
 services:
+  aws-demo-app-ui:
+    build:
+      context: ../aws-demo-app-2019-ui
+      dockerfile: Dockerfile
+      target: dev
+    ports:
+      - "3000:3000"
+    depends_on: 
+      - aws-demo-app-api
+      - aws-demo-app-worker
+    volumes:
+      - ../aws-demo-app-2019-ui/src:/opt/app/src
   aws-demo-app-api:
     build:
       context: ../aws-demo-app-2019-api
       dockerfile: Dockerfile
+      target: dev
     ports:
       - "4000:4000"
     environment:
       - LOG_LEVEL=debug
+    depends_on: 
+      - aws-localstack
     volumes:
       - ../aws-demo-app-2019-api/src:/opt/app/src
       - ../aws-demo-app-2019-api/.env.docker:/opt/app/.env
-      - ./mocks/credentials:/home/node/.aws/credentials
-    command: dev
+      - ./mocks/credentials:/root/.aws/credentials
   aws-demo-app-worker:
     build:
       context: ../aws-demo-app-2019-worker
       dockerfile: Dockerfile
+      target: dev
     environment:
       - LOG_LEVEL=debug
+    depends_on: 
+      - aws-localstack
     volumes:
       - ../aws-demo-app-2019-worker/src:/opt/app/src
       - ../aws-demo-app-2019-worker/.env.docker:/opt/app/.env
-      - ./mocks/credentials:/home/node/.aws/credentials
-    command: dev
+      - ./mocks/credentials:/root/.aws/credentials
   aws-localstack:
     image: "localstack/localstack:0.8.0"
     ports:
@@ -33,8 +49,5 @@ services:
       - "8088:8080"
     environment: 
       - SERVICES = s3,sqs,dynamodb
-      - DATA_DIR = /tmp/localstack/data
-    volumes:
-      - /tmp/localstack:/tmp/localstack
 
       
