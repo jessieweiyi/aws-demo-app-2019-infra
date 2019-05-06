@@ -49,7 +49,7 @@ CLUSTER_STACK_NAME := aws-demo-app-2019-cluster-$(ENVIRONMENT)
 PROVISION_CLUSTER_PARAMETERS := --stack-name $(CLUSTER_STACK_NAME) \
 	--template-body file://$(FOLDER_CF_TEMPLATES)/$(FILE_CF_TEMPLATE_CLUSTER) \
 	--parameters ParameterKey=Environment,ParameterValue=$(ENVIRONMENT) \
-	--parameters ParameterKey=NetworkStackName,ParameterValue=$(NETWORK_STACK_NAME) \
+	ParameterKey=NetworkStackName,ParameterValue=$(NETWORK_STACK_NAME) \
 	--capabilities CAPABILITY_IAM \
 	--region $(AWS_REGION)
 

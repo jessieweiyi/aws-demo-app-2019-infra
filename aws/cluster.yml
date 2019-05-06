@@ -6,7 +6,6 @@ Parameters:
     Description: "The name of the network stack"
   Environment:
     Type: String
-    Default: dev
     Description: "The deployment environment: dev, prod"
 Resources: 
   ECSCluster:
@@ -36,9 +35,7 @@ Resources:
       Description: Ingress from the ALB
       GroupId: !Ref ContainerSecurityGroup
       IpProtocol: -1
-      SourceSecurityGroupId: 
-        Fn::ImportValue:
-          !Join [':', [!Ref 'NetworkStackName', 'LoadBalancerSecurityGroup']]
+      SourceSecurityGroupId: !Ref LoadBalancerSG
   AutoscalingRole:
     Type: AWS::IAM::Role
     Properties:
@@ -113,6 +110,32 @@ Resources:
                 - 'logs:CreateLogStream'
                 - 'logs:PutLogEvents'
               Resource: '*'
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      LoadBalancerAttributes:
+        - Key: idle_timeout.timeout_seconds
+          Value: '30'
+      Subnets:
+        - 
+          Fn::ImportValue:
+            !Join [':', [!Ref 'NetworkStackName', 'PublicSubnetOne']]
+        - 
+          Fn::ImportValue:
+            !Join [':', [!Ref 'NetworkStackName', 'PublicSubnetTwo']]
+      SecurityGroups: [!Ref 'LoadBalancerSG']
+  LoadBalancerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the load balancer
+      VpcId: 
+        Fn::ImportValue:
+          !Join [':', [!Ref 'NetworkStackName', 'VPCId']]
+      SecurityGroupIngress:
+          # Allow access to ALB from anywhere on the internet
+          - CidrIp: 0.0.0.0/0
+            IpProtocol: -1
 Outputs:
   ClusterName:
     Description: The name of the ECS cluster
@@ -144,3 +167,18 @@ Outputs:
     Value: !Ref 'ContainerSecurityGroup'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'ContainerSecurityGroup' ] ]
+  LoadBalancer:
+    Description: LoadBalancer
+    Value: !Ref 'LoadBalancer'
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancer' ] ]
+  LoadBalancerCanonicalHostedZoneID:
+    Description: LoadBalancer Canonical Hosted Zone ID
+    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerCanonicalHostedZoneID' ] ]
+  LoadBalancerDNSName:
+    Description: LoadBalancer DNS Name
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerDNSName' ] ]

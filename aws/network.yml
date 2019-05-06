@@ -109,92 +109,72 @@ Resources:
     Properties:
       GroupDescription: Security Group for Private subnets
       VpcId: !Ref VPC
-  DynamoDBEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: "*"
-            Principal: "*"
-            Resource: "*"
-      RouteTableIds:
-        - !Ref 'PrivateRouteTableOne'
-        - !Ref 'PrivateRouteTableTwo'
-      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".dynamodb" ] ]
-      VpcId: !Ref 'VPC'
-  S3Endpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      PolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: Allow
-            Action: "*"
-            Principal: "*"
-            Resource: "*"
-      RouteTableIds:
-        - !Ref 'PrivateRouteTableOne'
-        - !Ref 'PrivateRouteTableTwo'
-      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".s3" ] ]
-      VpcId: !Ref 'VPC'
-  SQSEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".sqs" ] ]
-      VpcId: !Ref 'VPC'
-      VpcEndpointType: Interface
-      SubnetIds:
-        - !Ref PrivateSubnetOne
-        - !Ref PrivateSubnetTwo
-      SecurityGroupIds:
-        - !Ref PrivateSubnetSecurityGroup
-      PrivateDnsEnabled: true
-  ECRPrivateLink:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".ecr.dkr" ] ]
-      VpcId: !Ref 'VPC'
-      VpcEndpointType: Interface
-      SubnetIds:
-        - !Ref PrivateSubnetOne
-        - !Ref PrivateSubnetTwo
-      SecurityGroupIds:
-        - !Ref PrivateSubnetSecurityGroup
-      PrivateDnsEnabled: true
-  CloudwatchEndpoint:
-    Type: AWS::EC2::VPCEndpoint
-    Properties:
-      ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".monitoring" ] ]
-      VpcId: !Ref 'VPC'
-      VpcEndpointType: Interface
-      SubnetIds:
-        - !Ref PrivateSubnetOne
-        - !Ref PrivateSubnetTwo
-      SecurityGroupIds:
-        - !Ref PrivateSubnetSecurityGroup
-      PrivateDnsEnabled: true
-  LoadBalancer:
-    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
-    Properties:
-      Scheme: internet-facing
-      LoadBalancerAttributes:
-        - Key: idle_timeout.timeout_seconds
-          Value: '30'
-      Subnets:
-        - !Ref PublicSubnetOne
-        - !Ref PublicSubnetTwo
-      SecurityGroups: [!Ref 'LoadBalancerSG']
-  LoadBalancerSG:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Access to the load balancer
-      VpcId: !Ref VPC
-      SecurityGroupIngress:
-          # Allow access to ALB from anywhere on the internet
-          - CidrIp: 0.0.0.0/0
-            IpProtocol: -1
+  # DynamoDBEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     PolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Action: "*"
+  #           Principal: "*"
+  #           Resource: "*"
+  #     RouteTableIds:
+  #       - !Ref 'PrivateRouteTableOne'
+  #       - !Ref 'PrivateRouteTableTwo'
+  #     ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".dynamodb" ] ]
+  #     VpcId: !Ref 'VPC'
+  # S3Endpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     PolicyDocument:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Action: "*"
+  #           Principal: "*"
+  #           Resource: "*"
+  #     RouteTableIds:
+  #       - !Ref 'PrivateRouteTableOne'
+  #       - !Ref 'PrivateRouteTableTwo'
+  #     ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".s3" ] ]
+  #     VpcId: !Ref 'VPC'
+  # SQSEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".sqs" ] ]
+  #     VpcId: !Ref 'VPC'
+  #     VpcEndpointType: Interface
+  #     SubnetIds:
+  #       - !Ref PrivateSubnetOne
+  #       - !Ref PrivateSubnetTwo
+  #     SecurityGroupIds:
+  #       - !Ref PrivateSubnetSecurityGroup
+  #     PrivateDnsEnabled: true
+  # ECRPrivateLink:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".ecr.dkr" ] ]
+  #     VpcId: !Ref 'VPC'
+  #     VpcEndpointType: Interface
+  #     SubnetIds:
+  #       - !Ref PrivateSubnetOne
+  #       - !Ref PrivateSubnetTwo
+  #     SecurityGroupIds:
+  #       - !Ref PrivateSubnetSecurityGroup
+  #     PrivateDnsEnabled: true
+  # CloudwatchEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     ServiceName: !Join [ "", [ "com.amazonaws.", { "Ref": "AWS::Region" }, ".monitoring" ] ]
+  #     VpcId: !Ref 'VPC'
+  #     VpcEndpointType: Interface
+  #     SubnetIds:
+  #       - !Ref PrivateSubnetOne
+  #       - !Ref PrivateSubnetTwo
+  #     SecurityGroupIds:
+  #       - !Ref PrivateSubnetSecurityGroup
+  #     PrivateDnsEnabled: true
 Outputs:
   VPCId:
     Description: The ID of the VPC that this stack is deployed in
@@ -221,26 +201,6 @@ Outputs:
     Value: !Ref 'PrivateSubnetTwo'
     Export:
       Name: !Join [ ':', [ !Ref 'AWS::StackName', 'PrivateSubnetTwo' ] ]
-  LoadBalancer:
-    Description: LoadBalancer
-    Value: !Ref 'LoadBalancer'
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancer' ] ]
-  LoadBalancerSecurityGroup:
-    Description: LoadBalancer Security Group
-    Value: !Ref 'LoadBalancerSG'
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerSecurityGroup' ] ]
-  LoadBalancerCanonicalHostedZoneID:
-    Description: LoadBalancer Canonical Hosted Zone ID
-    Value: !GetAtt LoadBalancer.CanonicalHostedZoneID
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerCanonicalHostedZoneID' ] ]
-  LoadBalancerDNSName:
-    Description: LoadBalancer DNS Name
-    Value: !GetAtt LoadBalancer.DNSName
-    Export:
-      Name: !Join [ ':', [ !Ref 'AWS::StackName', 'LoadBalancerDNSName' ] ]
   PrivateSubnetSecurityGroup:
     Description: The Security Groups for all endpoints
     Value: !Ref PrivateSubnetSecurityGroup
