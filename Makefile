@@ -11,8 +11,8 @@ DYNAMODB_TABLE_NAME:=aws-demo-app-2019-jobs
 .PHONY: setup-mocks
 setup-mocks:
 	(sleep 5 && \
-	./mocks/setupMockSQSQueue.sh localhost $(SQS_LOCAL_PORT) $(SQS_QUEUE_NAME) && \
 	./mocks/setupMockS3Bucket.sh localhost $(S3_LOCAL_PORT) $(S3_BUCKET_NAME) && \
+	./mocks/setupMockSQSQueue.sh localhost $(SQS_LOCAL_PORT) $(SQS_QUEUE_NAME) && \
 	./mocks/setupMockDBTable.sh localhost $(DYNAMODB_LOCAL_PORT) $(DYNAMODB_TABLE_NAME)) & 
 
 .PHONY: run-local-dev

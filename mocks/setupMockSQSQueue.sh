@@ -21,4 +21,4 @@ do
 done
 
 sleep 1
-AWS_ACCESS_KEY_ID=your_access_key_id AWS_SECRET_ACCESS_KEY=your_secret_access_key aws sqs create-queue --endpoint-url http://$1:$2 --queue-name $3
+AWS_DEFAULT_REGION=ap-southeast-2 AWS_ACCESS_KEY_ID=your_access_key_id AWS_SECRET_ACCESS_KEY=your_secret_access_key aws sqs create-queue --endpoint-url http://$1:$2 --queue-name $3
